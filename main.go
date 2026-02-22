@@ -14,25 +14,27 @@ func main() {
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "ok")
 	})
-	http.HandleFunc("/test", PostGetTest)
+	http.HandleFunc("/redirect", redirector)
 
 	log.Fatal(http.ListenAndServe(port, nil))
-
-	fmt.Print(http.Get("http://localhost" + port + "/test"))
 }
 
-func PostGetTest(w http.ResponseWriter, r *http.Request) {
+func redirector(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	case "POST":
-		io.WriteString(w, "POST METHOD")
 	case "GET":
 		if r.URL.RawQuery == "" {
 			io.WriteString(w, "GET METHOD")
 			return
 		}
-		res, _ := http.Get(r.URL.RawQuery)
-		body, _ := io.ReadAll(res.Body)
-		io.WriteString(w, string(body))
+
+		client := &http.Client{}
+
+		request, _ := http.NewRequest("POST", r.URL.RawQuery, nil)
+		request.Header.Set("Cookie", r.Header.Get("Cookie"))
+		resp, _ := client.Do(request)
+
+		body, _ := io.ReadAll(resp.Body)
+		io.Writer.Write(w, body)
 
 	default:
 		io.WriteString(w, "METHOD NOT ALLOWED")
