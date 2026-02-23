@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -9,7 +8,6 @@ import (
 
 func main() {
 	check()
-	fmt.Print("Check completed\n")
 
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "ok")
@@ -20,23 +18,31 @@ func main() {
 }
 
 func redirector(w http.ResponseWriter, r *http.Request) {
+
+	if r.URL.RawQuery == "" {
+		io.WriteString(w, "REDIRECTION ERROR: URL EMPTY")
+		return
+	}
+
+	client := &http.Client{}
+	request := &http.Request{}
+
+	body_resp := []byte{}
+
 	switch r.Method {
 	case "GET":
-		if r.URL.RawQuery == "" {
-			io.WriteString(w, "GET METHOD")
-			return
-		}
-
-		client := &http.Client{}
-
-		request, _ := http.NewRequest("POST", r.URL.RawQuery, nil)
-		request.Header.Set("Cookie", r.Header.Get("Cookie"))
-		resp, _ := client.Do(request)
-
-		body, _ := io.ReadAll(resp.Body)
-		io.Writer.Write(w, body)
+		request, _ = http.NewRequest("GET", r.URL.RawQuery, r.Body)
+	case "POST":
+		request, _ = http.NewRequest("POST", r.URL.RawQuery, r.Body)
 
 	default:
 		io.WriteString(w, "METHOD NOT ALLOWED")
 	}
+
+	request.Header.Set("Cookie", r.Header.Get("Cookie"))
+
+	resp, _ := client.Do(request)
+	body_resp, _ = io.ReadAll(resp.Body)
+
+	io.Writer.Write(w, body_resp)
 }
