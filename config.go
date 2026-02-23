@@ -10,7 +10,7 @@ var port = os.Getenv("PORT")
 var certfile_path = os.Getenv("CERTFILE_PATH")
 var keyfile_path = os.Getenv("KEYFILE_PATH")
 
-func check() {
+func envcheck() {
 	if port == "" {
 		port = ":8080"
 		fmt.Printf("PORT not set, defaulting to %s\n", port)

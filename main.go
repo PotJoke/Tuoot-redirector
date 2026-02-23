@@ -7,14 +7,14 @@ import (
 )
 
 func main() {
-	check()
+	envcheck()
 
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "ok")
 	})
 	http.HandleFunc("/redirect", redirector)
 
-	log.Fatal(http.ListenAndServe(port, nil))
+	log.Fatal(http.ListenAndServeTLS(port, certfile_path, keyfile_path, nil))
 }
 
 func redirector(w http.ResponseWriter, r *http.Request) {
