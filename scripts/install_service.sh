@@ -8,7 +8,7 @@ After=network.target
 Type=simple
 User=www-data
 WorkingDirectory=/opt/Tuoot-redirector
-ExecStart=go run /opt/Tuoot-redirector/.
+ExecStart=/opt/Tuoot-redirector/app
 Restart=on-failure
 RestartSec=5s
 
