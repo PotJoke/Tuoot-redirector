@@ -25,20 +25,10 @@ func redirector(w http.ResponseWriter, r *http.Request) {
 	}
 
 	client := &http.Client{}
-	request := &http.Request{}
-
 	body_resp := []byte{}
 
-	switch r.Method {
-	case "GET":
-		request, _ = http.NewRequest("GET", r.URL.RawQuery, r.Body)
-	case "POST":
-		request, _ = http.NewRequest("POST", r.URL.RawQuery, r.Body)
-
-	default:
-		io.WriteString(w, "METHOD NOT ALLOWED")
-	}
-
+	request, _ := http.NewRequest(r.Method, r.URL.RawQuery, r.Body)
+	request.Header.Set("User-Agent", generateUserAgent())
 	request.Header.Set("Cookie", r.Header.Get("Cookie"))
 
 	resp, _ := client.Do(request)
